@@ -1,0 +1,38 @@
+from selenium.webdriver.common.keys import Keys
+from selenium import webdriver
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+import time
+
+options = webdriver.ChromeOptions()
+options.add_argument('--user-data-dir=C:\\Users\\Rachu\\AppData\\Local\\Google\\Chrome\\User Data\\Default')
+options.add_argument('--profile-directory=Default')
+
+
+driver = webdriver.Chrome(executable_path='C:\Python\chromedriver.exe', options=options)
+driver.get("https://web.whatsapp.com/")
+
+time.sleep(3)
+
+
+user_name_list = ['110110']#,'Миша А']
+for user_name in user_name_list:
+    WebDriverWait(driver, 10000).until(EC.visibility_of_element_located((By.XPATH, '//span[@title="{}"]'.format(user_name))))
+    user = driver.find_element_by_xpath('//span[@title="{}"]'.format(user_name))
+    user.click()
+    WebDriverWait(driver, 10000).until(EC.visibility_of_element_located((By.XPATH, '//div[@class="_3uMse"]')))
+    message_box = driver.find_element_by_xpath('//div[@class="_3uMse"]')
+    message_box.click()
+    message_box.send_keys(Keys.HOME)
+    message_box.send_keys("Ну как там с деньгами")
+    WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.XPATH, '//button[@class="_1U1xa"]')))
+    send_button = driver.find_element_by_xpath('//button[@class="_1U1xa"]')
+    send_button.click()
+
+   # i = 10
+#while i < 10:
+ #   message_box.send_keys('Так что с деньгами?')
+  #  send_button = driver.find_element_by_xpath('//button[@class="_1U1xa"]')
+   # send_button.click()
+    #i = i + 1
