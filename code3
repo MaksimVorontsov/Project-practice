@@ -1,0 +1,178 @@
+from selenium import webdriver
+import time
+import sys
+import autoit
+from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+
+def new_chat(user_name):
+    i = 30
+    WebDriverWait(driver, 2).until(EC.visibility_of_element_located((By.XPATH, '//div[@class="_3qx7_"]')))
+    new_chat = driver.find_element_by_xpath('//div[@class="_3qx7_"]')
+    new_chat.click()
+
+    WebDriverWait(driver, 2).until(EC.visibility_of_element_located((By.XPATH, '//div[@class="_3FRCZ copyable-text selectable-text"]')))
+    new_user = driver.find_element_by_xpath('//div[@class="_3FRCZ copyable-text selectable-text"]')
+    new_user.send_keys(user_name)
+    time.sleep(10000)
+    try:
+        #WebDriverWait(driver, 2).until(EC.visibility_of_element_located((By.XPATH, '//span[@title="{}"]')))
+        user = driver.find_element_by_xpath('//span[@title="{}"]'.format(user_name))
+        user.click()
+    except NoSuchElementException:
+        print('Given user "{}" not found in the contact list'.format(user_name))
+        user_name_list.remove("{}".format(user_name))
+        x = 1
+
+    except Exception as e:
+        driver.close()
+        print(e)
+        sys.exit()
+
+def send_message():
+    for user_name in user_name_list:
+        try:
+            user = driver.find_element_by_xpath('//span[@title="{}"]'.format(user_name))
+            user.click()
+        except NoSuchElementException as se:
+            new_chat(user_name)
+        time.sleep(1)
+        i = 0
+        while i < 20:
+            try:
+                message_box = driver.find_element_by_xpath('//div[@class="_3uMse"]')
+                message_box.click()
+                message_box.send_keys(message_name)
+                send_button = driver.find_element_by_xpath('//button[@class="_1U1xa"]')
+                send_button.click()
+                time.sleep(1)
+                i = 40
+            except NoSuchElementException:
+                try:
+                    WebDriverWait(driver, 2).until(EC.visibility_of_element_located((By.XPATH, '//div[@class="S7_rT FV2Qy"]')))
+                    enter_button = driver.find_element_by_xpath('//div[@class="S7_rT FV2Qy"]')
+                    enter_button.click()
+                except TimeoutException:
+                    i = 0
+                time.sleep(1)
+
+def edit_list():
+    print("0 - Вернуться")
+    print("1 - Ввести имя пользователя")
+    print("2 - Очистить список")
+    print("3 - Удалить пользователя из списка")
+    print("4 - Посмотреть список")
+    command = int(input())
+    try:
+        if command == 0:
+            print("Возвращаюсь")
+        if command == 1:
+            print ("Введите имя пользователя")
+            user_name_list.append(input())
+            print("Пользователь добавлен в список")
+        if command == 2:
+            user_name_list.clear()
+            print ("Список очищен")
+        if command == 3:
+            print("Введите имя пользователя, которого хотите удалить")
+            try:
+                user_name_list.remove(input())
+                print("Пользователь удален")
+            except ValueError:
+                print("Такого пользователя не было, но это не важно ")
+        if command == 4:
+            print(user_name_list)
+        if (command >3) or (command < 0):
+            print("Нужно написать число из списка")
+    except ValueError:
+        print("Пожалуйста введите число из списка")
+
+def send_pic():
+    for user_name in user_name_list:
+        try:
+            user = driver.find_element_by_xpath('//span[@title="{}"]'.format(user_name))
+            user.click()
+        except NoSuchElementException as se:
+            new_chat(user_name)
+        time.sleep(1)
+        add_files_box = driver.find_element_by_xpath('//*[@id="main"]/footer/div[1]/div[1]/div[2]')
+        add_files_box.click()
+        add_files_box1 = driver.find_element_by_xpath('//*[@id="main"]/footer/div[1]/div[1]/div[2]/span/div/div/ul/li[1]')
+        add_files_box1.click()
+        time.sleep(1)
+        autoit.win_active("Открытие")
+        autoit.control_send("Открытие", "Edit1", r"C:\Users\Rachu\FilesforBot"+"\kover2-1.jpg")
+        autoit.control_send("Открытие", "Edit1", "{ENTER}")
+        time.sleep(2)
+        add_files_box2 = driver.find_element_by_xpath('//*[@id="app"]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/span/div/div/span')
+        add_files_box2.click()
+
+
+
+
+
+def edit_message():
+    print("0 - Вернуться")
+    print("1 - Изменить сообщение")
+    print("2 - Отправить сообщение")
+    print("3 - Посмотреть сообщение")
+    edmessage = int(input())
+    try:
+        if edmessage == 0:
+            print("Возвращаюсь")
+        if edmessage == 1:
+            print("Введите текст сообщения")
+            message_name.clear()
+            message_name.append(input())
+        if edmessage == 2:
+            send_message()
+        if edmessage == 3:
+            print(message_name)
+        if (edmessage < 0) or (edmessage > 3):
+            print("Нужно написать число из списка")
+    except ValueError:
+        print("Пожалуйста введите число из списка")
+
+options = webdriver.ChromeOptions()
+options.add_argument('--user-data-dir=C:\\Users\\Rachu\\AppData\\Local\\Google\\Chrome\\User Data\\Default')
+options.add_argument('--profile-directory=Default')
+
+driver = webdriver.Chrome(executable_path='C:\Python\chromedriver.exe', options=options)
+driver.get("https://web.whatsapp.com/")
+
+#send_message_code
+user_name_list = ['110110']
+message_name = ['Это сообщение написано ботом!']
+print("Обновите страницу в WhatsApp")
+
+k = 0
+while k < 1:
+    print ("Выберите действие: ")
+    print("0 - отправление файла")
+    print("1 - редактирование списка")
+    print("2 - редактирование сообщения")
+    print("3 - закрыть вкладку и завершить работу программы")
+    try:
+        start_command = int(input())
+        if start_command == 0:
+            send_pic()
+        if start_command == 1:
+            edit_list()
+        if start_command == 2:
+            edit_message()
+        if start_command == 3:
+            time.sleep(1)
+            driver.close()
+            k = k +1
+        if (start_command >3) or (start_command <0):
+            print("Нужно ввести число из предложенных")
+    except ValueError:
+        print("Пожалуйста введите число из списка")
+    print("Цикл завершен успешно")
+    time.sleep(1)
+
+
