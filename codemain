@@ -1,22 +1,267 @@
 #from datetime import date
 import time
 import sys
-import autoit
 import threading
 from selenium import webdriver
 #from selenium.webdriver.common.actions.key_actions import keys_to_typing
 from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import InvalidArgumentException
 from selenium.common.exceptions import TimeoutException
 #from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from autoit import send
 #from autoit import control_focus
 #from autoit import control_set_text
-from autoit import win_close
 from datetime import date
+####################OPEN WHATSAPPWEB####################################################
+options = webdriver.ChromeOptions()
+options.add_argument('--user-data-dir=C:\\Users\\maksi\\AppData\\Local\\Google\\Chrome\\User Data\\Default')
+options.add_argument('--profile-directory=Default')
 
+driver = webdriver.Chrome(executable_path='C:\\Driver\\chromedriver.exe', options=options)
+driver.get("https://web.whatsapp.com/")
+
+WebDriverWait(driver, 1000).until(EC.visibility_of_element_located((By.XPATH, '//span[@title="{}"]'.format("Waiting_room_for_bot"))))
+user_default0 = driver.find_element_by_xpath('//span[@title="{}"]'.format("Waiting_room_for_bot"))
+user_default0.click()
+############LIST##########################################
+# lists
+current_time = ['00:00']
+mailing_time = ['09:00']
+message_delivered = [0]
+
+user_name_list = ['110110', '11111','Миша А']
+
+message_name = ['']
+
+holidays = ['01_01','25_09', '05_01']
+today_holiday = []
+
+chek_list = ['']
+main_counter = [0]
+######################TREAD###############################
+def clock():
+    exist = 0
+    while exist == 0 :
+        current_time.clear()
+        t = time.localtime()
+        now = time.strftime("%H:%M", t)
+        if now == '00:00':
+            message_delivered[0] = 0
+        if now == mailing_time[0]:
+            message_delivered[0] = 1
+
+        current_time.append(now)
+        print("current time:" + str(current_time))
+        time.sleep(60)
+####################messages##################################
+def send_message(mesname):
+    i = 0
+    while i == 0:
+        try:
+            message_box = driver.find_element_by_xpath('//div[@class="DuUXI"]')
+            message_box.click()
+            message_box.send_keys(mesname)
+            send_button = driver.find_element_by_xpath('//*[@id="main"]/footer/div[1]/div[3]/button')
+            send_button.click()
+            i = 1
+            time.sleep(1)
+        except NoSuchElementException:
+            pass
+def new_chat(user_name):
+    WebDriverWait(driver, 2).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="side"]/div[1]/div/label/div')))
+    new_chat = driver.find_element_by_xpath('//*[@id="side"]/div[1]/div/label/div')
+    new_chat.click()
+    try:
+        clear = driver.find_element_by_xpath('//*[@id="side"]/div[1]/div/button')
+        clear.click()
+    except NoSuchElementException:
+        pass
+    WebDriverWait(driver, 2).until(
+        EC.visibility_of_element_located((By.XPATH, '//*[@id="side"]/div[1]/div/label/div/div[2]')))
+    new_user = driver.find_element_by_xpath('//*[@id="side"]/div[1]/div/label/div/div[2]')
+    new_user.send_keys(user_name)
+    time.sleep(3)
+    try:
+        user = driver.find_element_by_xpath('//span[@title="{}"]'.format(user_name))
+        user.click()
+        return 0
+    except NoSuchElementException:
+        print('Given user "{}" not found in the contact list, please add this user in your contact list'.format(user_name))
+        return 1
+
+    except Exception as e:
+        driver.close()
+        print(e)
+        sys.exit()
+def send_message_to_user(user_name, mesname):
+    exist = 0
+    try:
+        user = driver.find_element_by_xpath('//span[@title="{}"]'.format(user_name))
+        user.click()
+    except NoSuchElementException:
+        exist = new_chat(user_name)
+    if exist == 0:
+        send_message(mesname)
+        user_default0 = driver.find_element_by_xpath('//span[@title="{}"]'.format("Waiting_room_for_bot"))
+        user_default0.click()
+def send_message_to_list(mesname):
+    for user in user_name_list:
+        send_message_to_user(user, mesname)
+#################pics##########################################
+def send_pic(path, text = ''):
+    attach_button = driver.find_element_by_xpath('//div[@title = "Прикрепить"]')
+    attach_button.click()
+
+    img_box = driver.find_element_by_xpath('//input[@accept="image/*,video/mp4,video/3gpp,video/quicktime"]')
+    img_box.send_keys(path)
+
+    if text != '':
+        WebDriverWait(driver, 10).until(EC.visibility_of_element_located(
+            (By.XPATH, '//*[@id="app"]/div/div/div[2]/div[2]/span/div/span/div/div/'
+                       'div[2]/div[1]/span/div/div[2]/div/div[3]/div[1]')))
+        text_box = driver.find_element_by_xpath('//*[@id="app"]/div/div/div[2]/div[2]/span/div/span/div/div/'
+                                                'div[2]/div[1]/span/div/div[2]/div/div[3]/div[1]')
+        delivered = 0
+        while delivered == 0:
+            try:
+                text_box.send_keys(text)
+                x_sign = driver.find_element_by_xpath(
+                    '//*[@id="app"]/div/div/div[2]/div[2]/span/div/'
+                    'span/div/div/div[2]/div[1]/span/div/div[2]/div/div[3]/div[2]/div[1]/div')
+                delivered = 1
+            except NoSuchElementException:
+                pass
+
+    WebDriverWait(driver,10).until(EC.visibility_of_element_located(
+        (By.XPATH,'//*[@id="app"]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/span/div/div' )))
+    send_button = driver.find_element_by_xpath('//*[@id="app"]/div/div/div[2]/div[2]/'
+                                               'span/div/span/div/div/div[2]/span/div/div')
+    send_button.click()
+def send_pic_to_user(user_name, path, text =''):
+    exist = 0
+    try:
+        user = driver.find_element_by_xpath('//span[@title="{}"]'.format(user_name))
+        user.click()
+    except NoSuchElementException:
+        exist = new_chat(user_name)
+    if exist == 0:
+        send_pic(path, text)
+        user_default0 = driver.find_element_by_xpath('//span[@title="{}"]'.format("Waiting_room_for_bot"))
+        user_default0.click()
+def send_pic_to_list(path, text=''):
+    for user in user_name_list:
+        send_pic_to_user(user, path, text)
+###########################################################
+def chek_date():
+    today = date.today()
+    d1 = today.strftime("%d_%m")
+    for element in holidays:
+        if element == d1:
+            today_holiday.append(element)#
+            file_name = 'C:\\Users\\maksi\\Downloads\\' + today_holiday[0] + '.jpg'
+            try:
+                send_pic(file_name)
+            except InvalidArgumentException:
+                print("Can't find the file {}".format(file_name))
+def sleeper():
+    try:
+        chek = input()
+        chek_list[0] = chek
+        time.sleep(1)
+    except ValueError:
+        pass
+def edit_time():
+    print("Введите время рассылки:")
+    mailing_time.clear()
+    mailing_time.append(input())
+def setup():
+    setup_counter = 0
+    while setup_counter == 0:
+        print("Choose an action: ")
+        print("0 - continue to do work")
+        print("1 - change mailing time")
+        print("2 - close the tab and exit the program")
+        try:
+            start_command = int(input())
+            if start_command == 0:
+                setup_counter = 1
+            if start_command == 1:
+                edit_time()
+            if start_command == 2:
+                time.sleep(1)
+                setup_counter = 1
+                main_counter[0] = 1
+                driver.close()
+            if (start_command > 2) or (start_command < 0):
+                print("Нужно ввести число из предложенных")
+        except ValueError:
+            print("Пожалуйста введите число из списка")
+        print("Цикл завершен успешно")
+        time.sleep(1)
+###############################################################
+def chek_last_message():
+    last_message = driver.find_elements_by_css_selector("span.selectable-text.invisible-space.copyable-text")
+    msg = [message.text for message in last_message]
+    message_name.clear()
+    message_name.append(msg[-1])
+def chek_for_unseen():
+    try:
+        unseen = driver.find_element_by_xpath('//*[@id="pane-side"]/div[1]/div/div/div[14]/div/div/div[2]/div[2]/div[2]')
+        unseen.click()
+        chek_last_message()
+        if message_name[0].replace('!','') =='Good morning' or message_name[0] =='good morning':
+            send_message('Good Mоrning!')
+        else:
+            user_default1 = driver.find_element_by_xpath('//span[@title="{}"]'.format("Waiting_room_for_bot"))
+            user_default1.click()
+    except NoSuchElementException:
+        pass
+
+
+#################main##########################################
+t1 = threading.Thread(target=clock, daemon=True)
+t1.start()
+while main_counter[0] == 0:
+    if threading.active_count() == 2:
+        t2 = threading.Thread(target=sleeper, daemon=True)
+        t2.start()
+    if message_delivered[0] == 1:
+        chek_date()
+        message_delivered[0] = 2
+    chek_for_unseen()
+    if chek_list[0] == 'setup':
+        print("Переброс на настройки")
+        setup()
+        chek_list[0] = ''
+    time.sleep(3)
+print("End")
+time.sleep(1000)
+'''while len(main_counter) == 0:
+    chek_for_unseen()
+    chek_time()f
+    if len(current_time_list) != 0:
+        chek_date()
+    if threading.active_count() == 1:
+        t = threading.Thread(target=sleeper, daemon=True)
+        t.start()
+    timerforinput = 0
+    while timerforinput < 10:
+        time.sleep(6)
+        if chek_list[0] == 'setup':
+            print("Переброс на настройки")
+            while len(setup_counter) == 0:
+                setup()
+            timerforinput = 100
+            chek_list.clear()
+            chek_list.append('')
+        timerforinput = timerforinput + 1
+    setup_counter.clear()
+    today_holiday.clear()
+    current_time_list.clear()
+    '''
+'''
 def new_chat(user_name):
     WebDriverWait(driver, 2).until(EC.visibility_of_element_located((By.XPATH, '//div[@class="_3qx7_"]')))
     new_chat = driver.find_element_by_xpath('//div[@class="_3qx7_"]')
@@ -354,4 +599,4 @@ while len(main_counter) == 0:
     setup_counter.clear()
     today_holiday.clear()
     current_time_list.clear()
-
+    '''
