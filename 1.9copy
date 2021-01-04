@@ -16,6 +16,7 @@ from autoit import send
 #from autoit import control_set_text
 from autoit import win_close
 from datetime import date
+import random
 
 def new_chat(user_name):
     WebDriverWait(driver, 2).until(EC.visibility_of_element_located((By.XPATH, '//div[@class="_3qx7_"]')))
@@ -121,18 +122,26 @@ def send_pic(nameforpic):
         if sendpic_count.count('1') == 1:
             add_files_box = driver.find_element_by_xpath('//*[@id="main"]/footer/div[1]/div[1]/div[2]')
             add_files_box.click()
-            WebDriverWait(driver, 2).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="main"]/footer/div[1]/div[1]/div[2]/div/span/div/div/ul/li[1]/button')))
+            WebDriverWait(driver, 60).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="main"]/footer/div[1]/div[1]/div[2]/div/span/div/div/ul/li[1]/button')))
             add_files_box1 = driver.find_element_by_xpath('//*[@id="main"]/footer/div[1]/div[1]/div[2]/div/span/div/div/ul/li[1]/button')
             add_files_box1.click()
             time.sleep(2)
             try:
                 autoit.win_active("Открытие")
                 autoit.control_send("Открытие", "Edit1", nameforpic)
-                autoit.control_send("Открытие", "Edit1", "{ENTER}")
-                #WebDriverWait(driver, 4).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="app"]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/span/div/div/span')))
-                add_files_box2 = driver.find_element_by_xpath('//*[@id="app"]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/span/div/div/span')
-                add_files_box2.click()
-
+                try:
+                    ip = 0
+                    while ip == 0:
+                        autoit.control_click("Открытие", "Button1", button="left", clicks=1)
+                except:
+                    pass
+                try:
+                    WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="app"]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/span/div/div/span')))
+                    add_files_box2 = driver.find_element_by_xpath('//*[@id="app"]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/span/div/div/span')
+                    add_files_box2.click()
+                except TimeoutException:
+                    add_files_box2 = driver.find_element_by_xpath('//*[@id="app"]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/span/div/div/span')
+                    add_files_box2.click()
             except NoSuchElementException:
                 time.sleep(1)
                 autoit.win_active("Открытие")
@@ -144,11 +153,15 @@ def send_pic(nameforpic):
                     time.sleep(1)
                 print("Введите имя правильно")
                 pic_name.clear()
-                pic_name.append("kover2-1")
+                pic_name.append("01_01")
                 user_default = driver.find_element_by_xpath('//span[@title="{}"]'.format("Waiting_room_for_bot"))
                 user_default.click()
-    user_default = driver.find_element_by_xpath('//span[@title="{}"]'.format("Waiting_room_for_bot"))
-    user_default.click()
+    try:
+        WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.XPATH, '//span[@title="Waiting_room_for_bot"]')))
+        user_default = driver.find_element_by_xpath('//span[@title="Waiting_room_for_bot"]')
+        user_default.click()
+    except TimeoutException:
+        time.sleep(0)
 
 def edit_pic():
     print("0 - Вернуться")
@@ -206,7 +219,6 @@ def chek_for_unseen():
                 try:
                     message_box1 = driver.find_element_by_xpath('//*[@id="main"]/footer/div[1]/div[2]')
                     message_box1.click()
-                    message_box1.send_keys()
                     message_box1.send_keys("Доброе утрo")
                     send_button = driver.find_element_by_xpath('//button[@class="_1U1xa"]')
                     send_button.click()
@@ -222,13 +234,59 @@ def chek_for_unseen():
                     except TimeoutException:
                         i = 0
                     time.sleep(1)
+        elif message_name_1[0] =='мем' or message_name_1[0] == 'Мем':
+            r = 1
+            while (r != 0):
+                r = 0
+                k = random.randint(0, 26)
+                for a in randomcount:
+                    if a == k:
+                        r = 1
+            randomcount.append(k)
+            print(k)
+            print("значение: "+comments[k])
+            add_files_box = driver.find_element_by_xpath('//*[@id="main"]/footer/div[1]/div[1]/div[2]')
+            add_files_box.click()
+            WebDriverWait(driver, 60).until(EC.visibility_of_element_located(
+                (By.XPATH, '//*[@id="main"]/footer/div[1]/div[1]/div[2]/div/span/div/div/ul/li[1]/button')))
+            add_files_box1 = driver.find_element_by_xpath(
+                '//*[@id="main"]/footer/div[1]/div[1]/div[2]/div/span/div/div/ul/li[1]/button')
+            add_files_box1.click()
+            time.sleep(2)
+            autoit.win_active("Открытие")
+            autoit.control_send("Открытие", "Edit1", str(k))
+            try:
+                ip =0
+                while ip == 0 :
+                    autoit.control_click("Открытие", "Button1",button="left", clicks=1 )
+                    time.sleep(1)
+            except:
+                pass
+            print("chek1")
+            if comments[k] != '':
+                print("chek2")
+                try:
+                    WebDriverWait(driver, 3).until(EC.visibility_of_element_located(
+                        (By.XPATH, '//*[@id="app"]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/div[1]/span/div/div[2]/div/div[3]/div[1]')))
+                    comment = driver.find_element_by_xpath('//*[@id="app"]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/div[1]/span/div/div[2]/div/div[3]/div[1]')
+                    comment.click()
+                    comment.send_keys(comments[k])
+                    print("chek3")
+                except TimeoutException:
+                    pass
+            WebDriverWait(driver, 5).until(EC.visibility_of_element_located(
+                (By.XPATH, '//*[@id="app"]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/span/div/div/span')))
+            add_files_box2 = driver.find_element_by_xpath(
+                '//*[@id="app"]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/span/div/div/span')
+            add_files_box2.click()
         else:
             i = 0
             user_default1 = driver.find_element_by_xpath('//span[@title="{}"]'.format("Waiting_room_for_bot"))
             user_default1.click()
+        user_default = driver.find_element_by_xpath('//span[@title="{}"]'.format("Waiting_room_for_bot"))
+        user_default.click()
     except NoSuchElementException:
         time.sleep(1)
-        print("Не найдено ни одного нового сообщения")
 
 def chek_last_message():
     last_message = driver.find_elements_by_css_selector("span.selectable-text.invisible-space.copyable-text")
@@ -238,12 +296,10 @@ def chek_last_message():
 
 def chek_date():
     today = date.today()
-    d1 = today.strftime("%d_%m")
-    print("Im working too")
+    d1 = today.strftime("%m-%d")
     for element in holidays:
         if element == d1:
             today_holiday.append(element)#
-            print("dddd")
             send_pic(today_holiday[0])
 
 def chek_time():
@@ -304,6 +360,15 @@ def sleeper():
     except ValueError:
         time.sleep(0)
 
+def reader():
+    path = 'C:\\Users\\Rachu\\PycharmProjects\\pythonProject4\\'
+    with open(path + 'max.txt', 'r') as max:
+        intmax = int(max.readline())
+    with open(path + 'file1.txt', 'r') as f:  # opens file for reading
+        for a in range(0,intmax):
+            line = f.readline().replace('\n', '').replace('null', '')
+            comments.append(line)
+
 options = webdriver.ChromeOptions()
 options.add_argument('--user-data-dir=C:\\Users\\Rachu\\AppData\\Local\\Google\\Chrome\\User Data\\Default')
 options.add_argument('--profile-directory=Default')
@@ -315,39 +380,113 @@ driver.get("https://web.whatsapp.com/")
 user_name_list = ['110110']
 message_name = ['Это сообщение написано ботом!']
 message_name_1 = ['']
-pic_name = ["kover2-1"]
-holidays = ['01_01','25_09']
+pic_name = ["01_01"]
+january=['01-01', '01-02', '01-03', '01-06', '01-07', '01-08', '01-11', '01-12', '01-13', '01-14', '01-18', '01-19', '01-21', '01-22', '01-25', '01-26', '01-30', '01-31']
+february=['02-02', '02-05', '02-06', '02-07', '02-08', '02-09', '02-10', '02-11', '02-14', '02-15', '02-17', '02-18', '02-21', '02-22', '02-23', '02-24', '02-27']
+march=['03-01', '03-02', '03-03', '03-05', '03-06', '03-07', '03-08', '03-09', '03-10', '03-12', '03-13', '03-14', '03-15', '03-17', '03-19', '03-20', '03-21', '03-22', '03-23', '03-24', '03-25', '03-27']
+april=['04-01', '04-02', '04-03', '04-04', '04-06', '04-07', '04-08', '04-10', '04-11', '04-12', '04-13', '04-15', '04-16', '04-17', '04-18', '04-19', '04-20', '04-21', '04-22', '04-23', '04-25', '04-26', '04-28', '04-29', '04-30']
+may=['05-01', '05-02', '05-03', '05-05', '05-06', '05-07', '05-09', '05-10', '05-11', '05-12', '05-13', '05-14', '05-15', '05-17', '05-18', '05-19', '05-21', '05-22', '05-23', '05-24', '05-25', '05-26', '05-27', '05-28', '05-29', '05-31']
+june=['06-01', '06-02', '06-03', '06-04', '06-05', '06-06', '06-07', '06-08', '06-09', '06-12', '06-13', '06-14', '06-15', '06-21', '06-22', '06-23', '06-25', '06-27', '06-30']
+july=['07-01', '07-02', '07-03', '07-04', '07-05', '07-06', '07-07', '07-08', '07-09', '07-11', '07-12', '07-15', '07-17', '07-18', '07-19', '07-20', '07-21', '07-23', '07-24', '07-25', '07-26', '07-28', '07-29', '07-30', '07-31']
+august=['08-01', '08-02', '08-03', '08-05', '08-06', '08-07', '08-08', '08-09', '08-11', '08-12', '08-13', '08-14', '08-15', '08-16', '08-17', '08-19', '08-21', '08-22', '08-26', '08-27', '08-28', '08-29', '08-30', '08-31']
+september=['09-01', '09-02', '09-03', '09-04', '09-05', '09-06', '09-08', '09-09', '09-11', '09-12', '09-13', '09-14', '09-16', '09-19', '09-20', '09-21', '09-22', '09-23', '09-24', '09-26', '09-27', '09-28', '09-29', '09-30']
+october=['10-01', '10-02', '10-03', '10-04', '10-05', '10-06', '10-08', '10-09', '10-10', '10-11', '10-12', '10-14', '10-15', '10-16', '10-17', '10-18', '10-20', '10-22', '10-23', '10-24', '10-25', '10-26', '10-27', '10-28', '10-29', '10-30', '10-31']
+november=['11-01', '11-04', '11-05', '11-06', '11-07', '11-08', '11-10', '11-11', '11-12', '11-13', '11-14', '11-15', '11-16', '11-17', '11-18', '11-19', '11-20', '11-21', '11-22', '11-26', '11-27', '11-28', '11-29', '11-30']
+december=['12-01', '12-02', '12-03', '12-04', '12-05', '12-06', '12-07', '12-08', '12-09', '12-10', '12-11', '12-12', '12-13', '12-14', '12-15', '12-17', '12-18', '12-19', '12-20', '12-22', '12-23', '12-25', '12-26', '12-27', '12-28', '12-31']
+holidays = []
+
+comments = []#read the file and paste the data
+reader()
+print(comments)
+
+m = date.today().strftime("%m")
+if m == '01':
+    holidays.extend(january)
+if m == '02':
+    holidays.extend(february)
+if m == '03':
+    holidays.extend(march)
+if m == '04':
+    holidays.extend(april)
+if m == '05':
+    holidays.extend(may)
+if m == '06':
+    holidays.extend(june)
+if m == '07':
+    holidays.extend(july)
+if m == '08':
+    holidays.extend(august)
+if m == '09':
+    holidays.extend(september)
+if m == '10':
+    holidays.extend(october)
+if m == '11':
+    holidays.extend(november)
+if m == '12':
+    holidays.extend(december)
+print(holidays)
+
+randomcount = []
 today_holiday = []
 current_time_list = []
-chek_list = []
+chek_list = ['']
 sendpic_count = ['1']
 setup_counter = []
 main_counter = []
-clock = ['14:58']
+clock = ['20:31']
 
 WebDriverWait(driver, 1000).until(EC.visibility_of_element_located((By.XPATH, '//span[@title="{}"]'.format("Waiting_room_for_bot"))))
 user_default0 = driver.find_element_by_xpath('//span[@title="{}"]'.format("Waiting_room_for_bot"))
 user_default0.click()
 
 while len(main_counter) == 0:
-    chek_for_unseen()
+    cm = date.today().strftime("%m")
+    if cm != m:
+        m = cm
+        holidays.clear()
+        if m == '01':
+            holidays.extend(january)
+        if m == '02':
+            holidays.extend(february)
+        if m == '03':
+            holidays.extend(march)
+        if m == '04':
+            holidays.extend(april)
+        if m == '05':
+            holidays.extend(may)
+        if m == '06':
+            holidays.extend(june)
+        if m == '07':
+            holidays.extend(july)
+        if m == '08':
+            holidays.extend(august)
+        if m == '09':
+            holidays.extend(september)
+        if m == '10':
+            holidays.extend(october)
+        if m == '11':
+            holidays.extend(november)
+        if m == '12':
+            holidays.extend(december)
     chek_time()
     if len(current_time_list) != 0:
         chek_date()
-    t = threading.Thread(target=sleeper, daemon=True)
-    t.start()
+    if threading.active_count() == 1:
+        t = threading.Thread(target=sleeper, daemon=True)
+        t.start()
+        pass
     timerforinput = 0
-    while timerforinput < 6:
-        time.sleep(10)
+    while timerforinput < 11:
+        chek_for_unseen()
+        time.sleep(5)
         if chek_list[0] == 'setup':
             print("Переброс на настройки")
             while len(setup_counter) == 0:
                 setup()
-            timerforinput = 10
+            timerforinput = 100
             chek_list.clear()
             chek_list.append('')
         timerforinput = timerforinput + 1
     setup_counter.clear()
     today_holiday.clear()
     current_time_list.clear()
-
