@@ -192,7 +192,7 @@ def choose_list(list_name):
                 line = f.readline().replace('\n', '').replace('null', '')
                 user_name_list.append(line)
     except FileNotFoundError:
-        print("Can't open file: " + PATH + 'list\\' + list_name + '.txt')
+        print("Can't open file: " + PATH + 'lists\\' + list_name + '.txt')
 
 def chek_date():
     print("chek Date")
