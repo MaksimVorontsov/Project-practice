@@ -180,17 +180,19 @@ def send_fun_pic():
     send_pic(PATH + 'funny_pic\\' + str(rand) + '.jpg', output_text[rand])
 ###########################################################
 def choose_list(list_name):
-    with open(PATH + 'lists\\' + list_name + '.txt', 'r',encoding='utf-8') as f:  # opens file for reading
-        reader = f.read()
-        counter = 0
-        for i in reader:
-            if i == '\n':
-                counter = counter + 1
-        f.seek(0)
-        for a in range(0,counter + 1):
-            line = f.readline().replace('\n', '').replace('null', '')
-            user_name_list.append(line)
-        print(user_name_list)
+    try:
+        with open(PATH + 'lists\\' + list_name + '.txt', 'r',encoding='utf-8') as f:  # opens file for reading
+            reader = f.read()
+            counter = 0
+            for i in reader:
+                if i == '\n':
+                    counter = counter + 1
+            f.seek(0)
+            for a in range(0,counter + 1):
+                line = f.readline().replace('\n', '').replace('null', '')
+                user_name_list.append(line)
+    except FileNotFoundError:
+        print("Can't open file: " + PATH + 'list\\' + list_name + '.txt')
 
 def chek_date():
     print("chek Date")
