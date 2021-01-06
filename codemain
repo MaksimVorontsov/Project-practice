@@ -6,6 +6,7 @@ from selenium import webdriver
 import csv
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import InvalidArgumentException
+from selenium.common.exceptions import ElementClickInterceptedException
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -58,14 +59,12 @@ user_name_list = []
 
 message_name = ['']
 
-today_holiday = []
-
 chek_list = ['']
 main_counter = [0]
 ######################TREAD###############################
 def clock():
     exist = 0
-    while exist == 0 :
+    while exist == 0:
         current_time.clear()
         t = time.localtime()
         now = time.strftime("%H:%M", t)
@@ -174,12 +173,20 @@ def send_pic_to_user(user_name, path, text =''):
         user_default0.click()
 def send_pic_to_list(path, text=''):
     for user in user_name_list:
-        send_pic_to_user(user, path, text)
+        counter = 0
+        while counter == 0:
+            try:
+                send_pic_to_user(user, path, text)
+                counter = 1
+            except ElementClickInterceptedException:
+                time.sleep(2)
+
 def send_fun_pic():
     rand = random.randint(0, maximum[0])
     send_pic(PATH + 'funny_pic\\' + str(rand) + '.jpg', output_text[rand])
 ###########################################################
 def choose_list(list_name):
+    user_name_list.clear()
     try:
         with open(PATH + 'lists\\' + list_name + '.txt', 'r',encoding='utf-8') as f:  # opens file for reading
             reader = f.read()
@@ -195,15 +202,11 @@ def choose_list(list_name):
         print("Can't open file: " + PATH + 'lists\\' + list_name + '.txt')
 
 def chek_date():
-    print("chek Date")
     today = date.today()
     d1 = today.strftime("%m-%d")
     for element in holidays:
-        print(element['date']+ ' = ' + d1 )
         if element['date'] == d1:
-            print("Let's go" + d1)
-            today_holiday.append(element['date'])
-            file_name = PATH + 'dates\\' + today_holiday[0]
+            file_name = PATH + 'dates\\' + d1
             choose_list(element['list'])
             try:
                 send_pic_to_list(file_name + '.jpg')
@@ -212,7 +215,6 @@ def chek_date():
                     send_pic_to_list(file_name + '.gif')
                 except InvalidArgumentException:
                     print("Can't find the file {}".format(file_name))
-            break
 def sleeper():
     try:
         chek = input()
@@ -228,7 +230,7 @@ def setup():
     setup_counter = 0
     while setup_counter == 0:
         print("Choose an action: ")
-        print("0 - continue to do work")
+        print("0 - continue to work")
         print("1 - change mailing time")
         print("2 - close the tab and exit the program")
         time.sleep(1)
@@ -236,14 +238,14 @@ def setup():
             start_command = int(input())
             if start_command == 0:
                 setup_counter = 1
-            if start_command == 1:
+            elif start_command == 1:
                 edit_time()
-            if start_command == 2:
+            elif start_command == 2:
                 time.sleep(1)
                 setup_counter = 1
                 main_counter[0] = 1
                 driver.close()
-            if (start_command > 2) or (start_command < 0):
+            elif (start_command > 2) or (start_command < 0):
                 print("You need to enter a number from the proposed")
         except ValueError:
             print("Please enter a number from the list")
