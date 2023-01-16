@@ -69,16 +69,9 @@ begin
 				Signal_mode_r <= "00";
 				Modulation_mode_r <= "00";
 				Mode_r <= '0';
-			elsif (rising_edge(clk)) then-- write constant address
-				if((WB_CTI = "001" or WB_CTI = "111") and WB_Cyc_2 = '1' and WB_WE = '1' and WB_Addr = x"000C") then
-					if(WB_STB = '1') then
-						if(full = '0') then
-							Ack_r <= '1';
-						else -- if FIFO is full
-							Ack_r <= '0';
-						end if;
-					end if;
-				elsif((WB_STB and WB_Cyc_2) = '1') then--other operation
+			elsif (rising_edge(clk)) then
+			
+				if ((WB_STB and WB_Cyc_2) = '1') then
 					if(Ack_r = '0') then
 						if (WB_Addr = x"000C")then
 						   if (full = '0') then
@@ -100,6 +93,7 @@ begin
 					Ack_r <= '0';
 				end if;
 				--
+				
 				if (WB_Cyc_2 = '1' and WB_WE = '1' and WB_STB = '1' and WB_Addr = x"000C") then
 					if(wrreq_r = '0') then
 						if (full = '0') then
@@ -117,14 +111,12 @@ begin
 				if (WB_Cyc_0 = '1') then 
 					if(WB_WE = '1' and WB_STB = '1') then 
 						if(WB_Addr = x"0000") then
-							if(WB_Sel(1) = '1')then
-								if(WB_DataIn(15 downto 7) = "000000000") then
-									Sync_r<= WB_DataIn(6);
-									nRstDDS_r<= WB_DataIn(5);
-									Signal_mode_r<= WB_DataIn(4 downto 3);
-									Modulation_mode_r<= WB_DataIn(2 downto 1);
-									Mode_r<= WB_DataIn(0);
-								end if;
+							if(WB_Sel(0) = '1')then
+								Sync_r<= WB_DataIn(6);
+								nRstDDS_r<= WB_DataIn(5);
+								Signal_mode_r<= WB_DataIn(4 downto 3);
+								Modulation_mode_r<= WB_DataIn(2 downto 1);
+								Mode_r<= WB_DataIn(0);
 							end if;
 						end if;
 					elsif(WB_WE = '0' and WB_STB = '1') then
